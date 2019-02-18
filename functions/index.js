@@ -21,9 +21,24 @@ exports.addCard = functions.https.onRequest((request, response) => {
 
 	console.log(body);
 
-	let title = body.fields.title;
+	let eng = 'en-US'
+	let title = body.fields.title[eng];
+	let description = body.fields.description[eng];
+	let type = body.fields.type[eng];
 
-	return admin.database().ref('/items').push({name: title}).then((snapshot) => {
-		return response.redirect(200, snapshot.ref.toString());
-	});
+	let dict = {
+		name: title,
+		text: description,
+		type: type
+	}
+
+	return admin.database()
+		.ref('/items/' + title)
+		.set(dict)
+		.then(snapshot => {
+			response.status(200).send('OK')
+		})
+		.catch(error => {
+			response.status(400).send('Error in adding item to Firebase database.')
+		});
 });
