@@ -65,3 +65,20 @@ exports.removeCard = functions.https.onRequest((request, response) => {
 			response.status(400).send(error.code)
 		});
 });
+
+exports.deleteUsers = functions.https.onRequest((request, response) => {
+	return admin.auth().listUsers()
+		.then(result => {
+			return result.users.filter(function(user) {
+				return user.email != 'watcher@test.com';
+			});
+		})
+		.then(users => {
+			users.forEach(function(user) {
+				admin.auth().deleteUser(user.uid);
+			})
+		})
+		.catch(error => {
+			response.status(400).send(error.code)
+		});
+});
